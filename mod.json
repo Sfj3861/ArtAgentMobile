@@ -5,14 +5,11 @@
   },
   "id": "sfj3861.artagentmobile",
   "name": "Art Agent Mobile",
-  "version": "v0.1.2",
+  "version": "0.1.3",
   "developer": "Sfj3861",
   "description": "Free decoration generator workflow for Geometry Dash on Android.",
   "repository": "https://github.com/Sfj3861/ArtAgentMobile",
-  "tags": [
-    "editor",
-    "utility"
-  ],
+  "tags": ["editor", "utility"],
   "dependencies": {},
   "settings": {
     "show-button": {
@@ -28,9 +25,7 @@
       "default": 0.72,
       "min": 0.4,
       "max": 1.4,
-      "control": {
-        "slider": true
-      }
+      "control": {"slider": true}
     },
     "button-opacity": {
       "name": "Floating button opacity",
@@ -39,9 +34,7 @@
       "default": 190,
       "min": 60,
       "max": 255,
-      "control": {
-        "slider": true
-      }
+      "control": {"slider": true}
     },
     "logo-color": {
       "name": "Logo accent color",
@@ -49,14 +42,8 @@
       "type": "string",
       "default": "cyan",
       "options": [
-        {
-          "name": "Cyan",
-          "value": "cyan"
-        },
-        {
-          "name": "Pink",
-          "value": "pink"
-        }
+        {"name": "Cyan", "value": "cyan"},
+        {"name": "Pink", "value": "pink"}
       ]
     },
     "open-bind": {
