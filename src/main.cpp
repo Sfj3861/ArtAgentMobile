@@ -1,42 +1,62 @@
 #include <Geode/Geode.hpp>
-#include <Geode/modify/MenuLayer.hpp>
+#include <Geode/modify/EditorUI.hpp>
 
 using namespace geode::prelude;
 
-// First runnable milestone: expose an Art Agent entry point in the main menu.
-// Prompt parsing, preview, and native editor-object insertion are not implemented yet.
-class $modify(ArtAgentMenuLayer, MenuLayer) {
-    bool init() {
-        if (!MenuLayer::init()) {
+// Editor-only entry point. Decoration generation/insertion is a later milestone.
+class $modify(ArtAgentEditorUI, EditorUI) {
+    bool init(LevelEditorLayer* editorLayer) {
+        if (!EditorUI::init(editorLayer)) {
             return false;
         }
 
-        auto menu = this->getChildByID("bottom-menu");
-        if (menu) {
-            auto label = CCLabelBMFont::create("ART AGENT", "bigFont.fnt");
-            if (label) {
-                auto button = CCMenuItemLabel::create(
-                    label,
-                    this,
-                    menu_selector(ArtAgentMenuLayer::onArtAgent)
-                );
-                if (button) {
-                    button->setID("art-agent-mobile-button"_spr);
-                    menu->addChild(button);
-                    menu->updateLayout();
-                }
+        auto color = Mod::get()->getSettingValue<std::string>("logo-color");
+        auto frame = (color == "pink")
+            ? "GJ_button_02.png"
+            : "GJ_button_04.png";
+
+        auto icon = CCSprite::createWithSpriteFrameName(frame);
+        if (icon) {
+            icon->setScale(0.72f);
+            auto sparkle = CCLabelBMFont::create("✦", "bigFont.fnt");
+            if (sparkle) {
+                sparkle->setScale(0.55f);
+                sparkle->setPosition(icon->getContentSize() / 2);
+                icon->addChild(sparkle);
+            }
+
+            auto button = CCMenuItemSpriteExtra::create(
+                icon,
+                this,
+                menu_selector(ArtAgentEditorUI::onArtAgent)
+            );
+            if (button) {
+                button->setID("art-agent-mobile-floating-button"_spr);
+                auto menu = CCMenu::create();
+                menu->setID("art-agent-mobile-floating-menu"_spr);
+                menu->setPosition(CCPointZero);
+                menu->addChild(button);
+                this->addChild(menu, 9999);
+                auto winSize = CCDirector::sharedDirector()->getWinSize();
+                button->setPosition({winSize.width - 42.f, winSize.height * 0.62f});
             }
         }
 
-        log::info("Art Agent Mobile loaded.");
+        log::info("Art Agent Mobile editor button loaded.");
         return true;
     }
 
     void onArtAgent(CCObject*) {
         FLAlertLayer::create(
-            "Art Agent Mobile",
-            "Prototype loaded!\n\nNext milestone: describe a decoration, preview generated Geometry Dash objects, then insert them into the editor.\n\nExample prompt: neon blue tech blocks with glowing edges",
-            "OK"
+            "Art Agent",
+            "DECORATION GENERATOR\n\n"
+            "1. Select the existing objects you want to decorate in the editor.\n"
+            "2. Choose the target editor layer for the generated decoration.\n"
+            "3. Describe the style in English for now.\n\n"
+            "Example: neon cyan tech blocks with glowing edges.\n\n"
+            "This build is the editor-entry prototype: generation, layer selection, "
+            "object preview, and insertion are not implemented yet.",
+            "Got it"
         )->show();
     }
 };
