@@ -1,0 +1,12 @@
+{
+  "geode": ">=4.0.0",
+  "gd": "2.2081",
+  "id": "sfj3861.artagentmobile",
+  "name": "Art Agent Mobile",
+  "version": "v0.1.0",
+  "developer": "Sfj3861",
+  "description": "Free text- and image-assisted decoration generation for Geometry Dash on Android.",
+  "repository": "https://github.com/Sfj3861/ArtAgentMobile",
+  "tags": ["editor", "utility"],
+  "dependencies": {}
+}
