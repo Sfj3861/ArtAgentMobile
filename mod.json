@@ -5,7 +5,7 @@
   },
   "id": "sfj3861.artagentmobile",
   "name": "Art Agent Mobile",
-  "version": "v0.1.1",
+  "version": "v0.1.2",
   "developer": "Sfj3861",
   "description": "Free decoration generator workflow for Geometry Dash on Android.",
   "repository": "https://github.com/Sfj3861/ArtAgentMobile",
@@ -15,9 +15,37 @@
   ],
   "dependencies": {},
   "settings": {
+    "show-button": {
+      "name": "Show floating Art Agent button",
+      "description": "Show the Art Agent shortcut button while editing a level.",
+      "type": "bool",
+      "default": true
+    },
+    "button-size": {
+      "name": "Floating button size",
+      "description": "Scale of the floating Art Agent icon.",
+      "type": "float",
+      "default": 0.72,
+      "min": 0.4,
+      "max": 1.4,
+      "control": {
+        "slider": true
+      }
+    },
+    "button-opacity": {
+      "name": "Floating button opacity",
+      "description": "Transparency of the floating Art Agent icon (0-255).",
+      "type": "float",
+      "default": 190,
+      "min": 60,
+      "max": 255,
+      "control": {
+        "slider": true
+      }
+    },
     "logo-color": {
-      "name": "Floating logo glow",
-      "description": "Choose the accent color used by the Art Agent editor button.",
+      "name": "Logo accent color",
+      "description": "Choose cyan or pink for the Art Agent floating logo.",
       "type": "string",
       "default": "cyan",
       "options": [
@@ -30,6 +58,14 @@
           "value": "pink"
         }
       ]
+    },
+    "open-bind": {
+      "name": "Open Art Agent",
+      "description": "Keyboard shortcut to open the Art Agent panel in the level editor.",
+      "type": "keybind",
+      "default": "K",
+      "category": "editor",
+      "allow-in-text-inputs": false
     }
   }
 }
