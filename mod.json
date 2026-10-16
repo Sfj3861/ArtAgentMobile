@@ -1,5 +1,5 @@
 {
-  "geode": ">=4.0.0",
+  "geode": ">=5.0.0-beta.1",
   "gd": {
     "android": "2.2081"
   },
@@ -9,6 +9,9 @@
   "developer": "Sfj3861",
   "description": "Free text- and image-assisted decoration generation for Geometry Dash on Android.",
   "repository": "https://github.com/Sfj3861/ArtAgentMobile",
-  "tags": ["editor", "utility"],
+  "tags": [
+    "editor",
+    "utility"
+  ],
   "dependencies": {}
 }
