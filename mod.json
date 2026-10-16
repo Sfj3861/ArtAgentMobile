@@ -5,13 +5,31 @@
   },
   "id": "sfj3861.artagentmobile",
   "name": "Art Agent Mobile",
-  "version": "v0.1.0",
+  "version": "v0.1.1",
   "developer": "Sfj3861",
-  "description": "Free text- and image-assisted decoration generation for Geometry Dash on Android.",
+  "description": "Free decoration generator workflow for Geometry Dash on Android.",
   "repository": "https://github.com/Sfj3861/ArtAgentMobile",
   "tags": [
     "editor",
     "utility"
   ],
-  "dependencies": {}
+  "dependencies": {},
+  "settings": {
+    "logo-color": {
+      "name": "Floating logo glow",
+      "description": "Choose the accent color used by the Art Agent editor button.",
+      "type": "string",
+      "default": "cyan",
+      "options": [
+        {
+          "name": "Cyan",
+          "value": "cyan"
+        },
+        {
+          "name": "Pink",
+          "value": "pink"
+        }
+      ]
+    }
+  }
 }
