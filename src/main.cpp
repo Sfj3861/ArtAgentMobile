@@ -21,7 +21,7 @@ class $modify(ArtAgentEditorUI, EditorUI) {
             auto sparkle = CCLabelBMFont::create("✦", "bigFont.fnt");
             if (sparkle) {
                 sparkle->setScale(0.55f);
-                sparkle->setPosition(icon->getContentSize() / 2);
+                sparkle->setPosition(CCPoint(icon->getContentSize().width / 2.f, icon->getContentSize().height / 2.f));
                 icon->addChild(sparkle);
             }
 
