@@ -11,12 +11,10 @@ class $modify(ArtAgentEditorUI, EditorUI) {
         }
 
         auto color = Mod::get()->getSettingValue<std::string>("logo-color");
-        auto frame = (color == "pink")
-            ? "GJ_button_02.png"
-            : "GJ_button_04.png";
-
-        auto icon = CCSprite::createWithSpriteFrameName(frame);
+        auto icon = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
         if (icon) {
+            icon->setColor(color == "pink" ? ccc3(255, 105, 205) : ccc3(0, 220, 255));
+            icon->setOpacity(190);
             icon->setScale(0.72f);
             auto sparkle = CCLabelBMFont::create("✦", "bigFont.fnt");
             if (sparkle) {
