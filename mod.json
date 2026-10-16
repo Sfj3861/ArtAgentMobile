@@ -1,6 +1,8 @@
 {
   "geode": ">=4.0.0",
-  "gd": "2.2081",
+  "gd": {
+    "android": "2.2081"
+  },
   "id": "sfj3861.artagentmobile",
   "name": "Art Agent Mobile",
   "version": "v0.1.0",
