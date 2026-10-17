@@ -21,6 +21,7 @@ class $modify(ArtAgentEditorUI, EditorUI) {
         int pattern = 0;
         int density = 1;
         int detail = 2;
+        unsigned int seed = 3861u;
         bool hasLayout = false;
         CCPoint layoutCenter = CCPointZero;
         float layoutMinX = 0.f, layoutMaxX = 0.f, layoutMinY = 0.f, layoutMaxY = 0.f;
@@ -137,6 +138,7 @@ class $modify(ArtAgentEditorUI, EditorUI) {
             auto lowLabel = CCLabelBMFont::create("LOW", "bigFont.fnt");
             auto medLabel = CCLabelBMFont::create("MED", "bigFont.fnt");
             auto highLabel = CCLabelBMFont::create("HIGH", "bigFont.fnt");
+            auto seedLabel = CCLabelBMFont::create("NEW SEED", "bigFont.fnt");
             if (previewLabel) {
                 previewLabel->setScale(0.55f);
                 auto item = CCMenuItemLabel::create(previewLabel, this,
@@ -168,6 +170,12 @@ class $modify(ArtAgentEditorUI, EditorUI) {
             addDetail(lowLabel, panel->getContentSize().width * 0.27f, menu_selector(ArtAgentEditorUI::onDetailLow));
             addDetail(medLabel, panel->getContentSize().width * 0.40f, menu_selector(ArtAgentEditorUI::onDetailMed));
             addDetail(highLabel, panel->getContentSize().width * 0.53f, menu_selector(ArtAgentEditorUI::onDetailHigh));
+            if (seedLabel) {
+                seedLabel->setScale(0.40f);
+                auto item = CCMenuItemLabel::create(seedLabel, this, menu_selector(ArtAgentEditorUI::onNewSeed));
+                item->setPosition({panel->getContentSize().width * 0.72f, 49.f});
+                menu->addChild(item);
+            }
             panel->addChild(menu);
         }
 
@@ -178,6 +186,10 @@ class $modify(ArtAgentEditorUI, EditorUI) {
     void onDetailLow(CCObject*) { m_fields->detail = 1; this->setStatus("Detail LOW selected."); }
     void onDetailMed(CCObject*) { m_fields->detail = 2; this->setStatus("Detail MEDIUM selected."); }
     void onDetailHigh(CCObject*) { m_fields->detail = 3; this->setStatus("Detail HIGH selected."); }
+    void onNewSeed(CCObject*) {
+        m_fields->seed = m_fields->seed * 1664525u + 1013904223u;
+        this->setStatus((std::string("Variation seed: ") + std::to_string(m_fields->seed) + ". Preview again to apply.").c_str());
+    }
 
     void captureSelectedLayout() {
         auto arr = CCArray::create();
@@ -315,11 +327,15 @@ class $modify(ArtAgentEditorUI, EditorUI) {
             "ancient ruins", "neon cyberpunk", "underwater reef", "infernal spikes",
             "celestial halos", "industrial machinery"
         };
+        unsigned int promptHash = 2166136261u;
+        for (unsigned char ch : prompt) promptHash = (promptHash ^ ch) * 16777619u;
+        m_fields->seed = (m_fields->seed & 0xffff0000u) | (promptHash & 0x0000ffffu);
         m_fields->previewDescription = prompt;
         m_fields->previewReady = true;
         this->setStatus((std::string("Plan: ") + names[m_fields->pattern] +
             (m_fields->density == 2 ? " / dense" : m_fields->density == 0 ? " / sparse" : " / normal") +
-            ". INSERT decorates around selected layout.").c_str());
+            " / seed " + std::to_string(m_fields->seed) +
+            ". Plan preview only; INSERT creates editable blocks.").c_str());
     }
 
     void onInsert(CCObject*) {
@@ -344,6 +360,11 @@ class $modify(ArtAgentEditorUI, EditorUI) {
         int stride = m_fields->detail == 1 ? 3 : m_fields->detail == 2 ? 2 : 1;
         if (m_fields->density == 2) stride = std::max(1, stride - 1);
         else if (m_fields->density == 0) stride = std::min(4, stride + 1);
+        unsigned int randomState = m_fields->seed;
+        auto nextRandom = [&]() -> unsigned int {
+            randomState = randomState * 1664525u + 1013904223u;
+            return randomState;
+        };
         auto add = [&](float x, float y) {
             if (inserted >= MAX_GENERATED_OBJECTS) {
                 reachedLimit = true;
@@ -625,6 +646,14 @@ class $modify(ArtAgentEditorUI, EditorUI) {
             }
             if(m_fields->detail>=3)
                 for(float x=x0;x<=x1;x+=15.f) { add(x,y1+12.f); add(x,y0-12.f); }
+        }
+        if (!reachedLimit && m_fields->detail >= 2) {
+            int accentCount = m_fields->density == 2 ? 18 : m_fields->density == 0 ? 5 : 10;
+            for (int i = 0; i < accentCount && inserted < MAX_GENERATED_OBJECTS; ++i) {
+                float x = x0 + static_cast<float>(nextRandom() % 10000u) / 10000.f * w;
+                float y = y0 + static_cast<float>(nextRandom() % 10000u) / 10000.f * h;
+                add(x, y);
+            }
         }
         m_fields->previewReady=false;
         std::string result = "Added " + std::to_string(inserted) +
