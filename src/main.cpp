@@ -237,6 +237,24 @@ class $modify(ArtAgentEditorUI, EditorUI) {
         else if (prompt.find("line") != std::string::npos ||
                  prompt.find("línea") != std::string::npos ||
                  prompt.find("linea") != std::string::npos) m_fields->pattern = 5;
+        else if (prompt.find("circuit") != std::string::npos ||
+                 prompt.find("circuito") != std::string::npos ||
+                 prompt.find("tech") != std::string::npos ||
+                 prompt.find("tecnológ") != std::string::npos ||
+                 prompt.find("tecnolog") != std::string::npos) m_fields->pattern = 6;
+        else if (prompt.find("gothic") != std::string::npos ||
+                 prompt.find("gótico") != std::string::npos ||
+                 prompt.find("gotico") != std::string::npos ||
+                 prompt.find("medieval") != std::string::npos) m_fields->pattern = 7;
+        else if (prompt.find("crystal") != std::string::npos ||
+                 prompt.find("cristal") != std::string::npos ||
+                 prompt.find("ice") != std::string::npos ||
+                 prompt.find("hielo") != std::string::npos) m_fields->pattern = 8;
+        else if (prompt.find("organic") != std::string::npos ||
+                 prompt.find("orgánico") != std::string::npos ||
+                 prompt.find("organico") != std::string::npos ||
+                 prompt.find("nature") != std::string::npos ||
+                 prompt.find("naturaleza") != std::string::npos) m_fields->pattern = 9;
 
         m_fields->density = 1;
         if (prompt.find("dense") != std::string::npos ||
@@ -248,7 +266,11 @@ class $modify(ArtAgentEditorUI, EditorUI) {
             prompt.find("pocos") != std::string::npos ||
             prompt.find("simple") != std::string::npos) m_fields->density = 0;
 
-        static char const* names[] = {"realistic architecture", "diamond trim", "ring frame", "wave trim", "star ornament", "linear trim"};
+        static char const* names[] = {
+            "realistic architecture", "diamond trim", "ring frame", "wave trim",
+            "star ornament", "linear trim", "tech circuits", "gothic arches",
+            "crystal facets", "organic curves"
+        };
         m_fields->previewDescription = prompt;
         m_fields->previewReady = true;
         this->setStatus((std::string("Plan: ") + names[m_fields->pattern] +
@@ -276,6 +298,8 @@ class $modify(ArtAgentEditorUI, EditorUI) {
         float y1 = m_fields->layoutMaxY + 30.f;
         float w = std::max(90.f, x1-x0), h = std::max(60.f, y1-y0);
         int stride = m_fields->detail == 1 ? 3 : m_fields->detail == 2 ? 2 : 1;
+        if (m_fields->density == 2) stride = std::max(1, stride - 1);
+        else if (m_fields->density == 0) stride = std::min(4, stride + 1);
         auto add = [&](float x, float y) {
             if (inserted >= MAX_GENERATED_OBJECTS) {
                 reachedLimit = true;
@@ -314,6 +338,75 @@ class $modify(ArtAgentEditorUI, EditorUI) {
         } else if (m_fields->pattern == 4) {
             const int pts[][2]={{0,3},{1,1},{3,0},{1,-1},{0,-3},{-1,-1},{-3,0},{-1,1}};
             for(auto const& p:pts) add(m_fields->layoutCenter.x+p[0]*30.f,m_fields->layoutCenter.y+p[1]*30.f);
+        } else if (m_fields->pattern == 6) {
+            // Circuit-board style: a double frame, repeating vertical traces,
+            // and short branches that resemble editable PCB paths.
+            for (float x=x0; x<=x1; x+=30.f*stride) {
+                add(x,y0); add(x,y1);
+                float mid=(y0+y1)*0.5f;
+                add(x,mid);
+                if (m_fields->detail>=2) {
+                    add(x+12.f,mid+12.f); add(x-12.f,mid-12.f);
+                    add(x,mid+24.f); add(x,mid-24.f);
+                }
+            }
+            for (float y=y0; y<=y1; y+=30.f*stride) {
+                add(x0,y); add(x1,y);
+            }
+            for (float x=x0+60.f; x<x1-30.f; x+=90.f*stride) {
+                add(x,y0+h*0.25f); add(x+30.f,y0+h*0.25f);
+                add(x,y0+h*0.75f); add(x+30.f,y0+h*0.75f);
+            }
+        } else if (m_fields->pattern == 7) {
+            // Gothic/medieval facade: tall bays with stepped pointed arches.
+            for (float x=x0; x<=x1; x+=30.f*stride) { add(x,y0); add(x,y1); }
+            float bay=std::max(60.f,w/(m_fields->detail==1?3.f:m_fields->detail==2?5.f:7.f));
+            for (float x=x0+bay*0.5f; x<x1-bay*0.25f; x+=bay) {
+                float bot=y0+h*0.22f, peak=y0+h*0.72f;
+                add(x,bot);
+                for (int j=0;j<4;++j) {
+                    float side=(j<2)?-1.f:1.f;
+                    float rise=(j%2==0)?0.f:18.f;
+                    add(x+side*(12.f+j*6.f), peak-std::abs(side*(12.f+j*6.f))*0.8f+rise);
+                }
+                add(x-bay*0.22f,bot); add(x+bay*0.22f,bot);
+                if (m_fields->detail>=2) {
+                    add(x-bay*0.22f,bot+30.f); add(x+bay*0.22f,bot+30.f);
+                }
+            }
+            for (int k=0;k<4;++k) {
+                float x=(k<2)?x0:x1, y=(k%2==0)?y0:y1;
+                for(int j=0;j<5;++j) add(x+((k<2)?1.f:-1.f)*j*12.f,y+((k%2==0)?1.f:-1.f)*j*12.f);
+            }
+        } else if (m_fields->pattern == 8) {
+            // Crystal/ice style: alternating facet diagonals and diamond bands.
+            int n=std::max(2,static_cast<int>(w/(30.f*stride)));
+            for(int i=0;i<=n;++i) {
+                float x=x0+w*static_cast<float>(i)/n;
+                add(x,y0); add(x,y1);
+                if(i%2==0) { add(x+15.f,y0+h*0.25f); add(x-15.f,y0+h*0.75f); }
+                else { add(x-15.f,y0+h*0.25f); add(x+15.f,y0+h*0.75f); }
+            }
+            for(float y=y0;y<=y1;y+=30.f*stride) { add(x0,y); add(x1,y); }
+            for(float x=x0+30.f;x<x1;x+=60.f*stride) {
+                add(x,y0+h*0.5f); add(x+15.f,y0+h*0.5f+18.f);
+                add(x+30.f,y0+h*0.5f); add(x+15.f,y0+h*0.5f-18.f);
+            }
+        } else if (m_fields->pattern == 9) {
+            // Organic pattern: staggered waves and branch-like curves.
+            for(float x=x0;x<=x1;x+=24.f*stride) {
+                float t=(x-x0)/w;
+                add(x,y0+h*(0.22f+0.06f*std::sin(t*8.f)));
+                add(x,y0+h*(0.78f+0.06f*std::sin(t*8.f+1.8f)));
+                if(m_fields->detail>=2) {
+                    add(x,y0+h*(0.5f+0.12f*std::sin(t*10.f)));
+                }
+            }
+            for(float y=y0+30.f;y<y1-20.f;y+=45.f*stride) {
+                for(float x=x0+30.f;x<x1-20.f;x+=60.f*stride) {
+                    add(x,y); add(x+12.f,y+12.f); add(x+24.f,y+18.f);
+                }
+            }
         } else {
             for(float x=x0; x<=x1; x+=30.f*stride) {
                 add(x,y0); add(x,y1);
