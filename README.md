@@ -4,21 +4,20 @@ Native Geode mod for Geometry Dash Android 2.2081, targeting Geode 5.6.1.
 
 ## Current implementation
 
-- Editor-only Art Agent shortcut and keyboard binding configuration.
-- Prompt field and in-editor panel.
-- Preview/insert workflow for a simple, fixed pattern of native block objects.
-- GitHub Actions workflow targeting Android32 and Android64.
+- Editor-only floating shortcut and configurable keyboard binding.
+- Prompt field with offline style keyword parsing (English and some Spanish).
+- Uses the current editor selection as a bounding area for newly generated decoration.
+- LOW / MED / HIGH detail controls.
+- Architectural-style blockout generator with perimeter courses, corner supports, window-like bays and finer trim at higher detail.
+- Adds ordinary editable Geometry Dash objects; it does not intentionally modify the selected layout objects.
+- GitHub Actions workflow targets Android32 and Android64.
 
-## Known limitations — not a complete release
+## Important limitations
 
-This repository does NOT yet implement the complete Art Agent specification. The current preview is only a message describing a fixed pattern; it is not a true rendered preview of the exact inserted objects. The current insert operation creates a fixed pattern of block objects at a fixed coordinate, regardless of prompt meaning. It does not capture the current selection, adapt decoration to existing geometry, provide a target-layer picker, preserve Group IDs or Hide relationships, create a draggable floating button, or provide robust undo/transaction handling. These capabilities must not be represented as finished.
+This is an early procedural decorator, not a full image-generating AI. “Realistic” currently means architectural structure suggested with repeated native block objects; it does not yet create advanced textured materials, lighting, shadows, custom color channels, or a true visual preview. The selected objects are used to calculate a bounding rectangle, so irregular layouts may receive imperfect decoration. Generated objects do not yet inherit Group IDs, Editor Layer assignments, Hide behavior, or trigger relationships automatically. Review the result before saving, and keep a backup of important levels.
 
-The current code is a development build and must be compiled and tested on both Android architectures and then tested in Geometry Dash before it can be described as ready to install.
+The latest source change has been committed, but its Android build is still pending. A successful compile alone does not prove in-game behavior.
 
 ## Build
 
 Open Actions → Build Android Geode mod. Successful jobs upload .geode artifacts for Android32 and Android64. A successful compile alone does not prove in-game behavior.
-
-## Design requirements
-
-The intended finished mod should provide prompt-based generation of editable native Geometry Dash objects, preview the generated objects before insertion, operate on user-selected geometry, and preserve relevant Group IDs and Hide/layout behavior without damaging unrelated level content. It should be free to use and not require paid APIs or ads.
