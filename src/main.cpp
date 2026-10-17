@@ -22,6 +22,7 @@ class $modify(ArtAgentEditorUI, EditorUI) {
         int density = 1;
         int detail = 2;
         unsigned int seed = 3861u;
+        unsigned int promptHash = 2166136261u;
         bool hasLayout = false;
         CCPoint layoutCenter = CCPointZero;
         float layoutMinX = 0.f, layoutMaxX = 0.f, layoutMinY = 0.f, layoutMaxY = 0.f;
@@ -327,9 +328,9 @@ class $modify(ArtAgentEditorUI, EditorUI) {
             "ancient ruins", "neon cyberpunk", "underwater reef", "infernal spikes",
             "celestial halos", "industrial machinery"
         };
-        unsigned int promptHash = 2166136261u;
-        for (unsigned char ch : prompt) promptHash = (promptHash ^ ch) * 16777619u;
-        m_fields->seed = (m_fields->seed & 0xffff0000u) | (promptHash & 0x0000ffffu);
+        m_fields->promptHash = 2166136261u;
+        for (unsigned char ch : prompt)
+            m_fields->promptHash = (m_fields->promptHash ^ ch) * 16777619u;
         m_fields->previewDescription = prompt;
         m_fields->previewReady = true;
         this->setStatus((std::string("Plan: ") + names[m_fields->pattern] +
@@ -360,7 +361,8 @@ class $modify(ArtAgentEditorUI, EditorUI) {
         int stride = m_fields->detail == 1 ? 3 : m_fields->detail == 2 ? 2 : 1;
         if (m_fields->density == 2) stride = std::max(1, stride - 1);
         else if (m_fields->density == 0) stride = std::min(4, stride + 1);
-        unsigned int randomState = m_fields->seed;
+        // Keep user seed independent from the prompt; combine both only for generation.
+        unsigned int randomState = m_fields->seed ^ m_fields->promptHash;
         auto nextRandom = [&]() -> unsigned int {
             randomState = randomState * 1664525u + 1013904223u;
             return randomState;
