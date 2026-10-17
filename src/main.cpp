@@ -254,7 +254,45 @@ class $modify(ArtAgentEditorUI, EditorUI) {
                  prompt.find("orgánico") != std::string::npos ||
                  prompt.find("organico") != std::string::npos ||
                  prompt.find("nature") != std::string::npos ||
-                 prompt.find("naturaleza") != std::string::npos) m_fields->pattern = 9;
+                 prompt.find("naturaleza") != std::string::npos ||
+                 prompt.find("jungle") != std::string::npos ||
+                 prompt.find("selva") != std::string::npos) m_fields->pattern = 9;
+        else if (prompt.find("steampunk") != std::string::npos ||
+                 prompt.find("clockwork") != std::string::npos ||
+                 prompt.find("engranaje") != std::string::npos ||
+                 prompt.find("reloj") != std::string::npos) m_fields->pattern = 10;
+        else if (prompt.find("sci-fi") != std::string::npos ||
+                 prompt.find("scifi") != std::string::npos ||
+                 prompt.find("futuristic") != std::string::npos ||
+                 prompt.find("futurista") != std::string::npos ||
+                 prompt.find("spaceship") != std::string::npos ||
+                 prompt.find("nave") != std::string::npos) m_fields->pattern = 11;
+        else if (prompt.find("ruin") != std::string::npos ||
+                 prompt.find("ruina") != std::string::npos ||
+                 prompt.find("abandoned") != std::string::npos ||
+                 prompt.find("abandonado") != std::string::npos) m_fields->pattern = 12;
+        else if (prompt.find("neon") != std::string::npos ||
+                 prompt.find("neón") != std::string::npos ||
+                 prompt.find("cyberpunk") != std::string::npos) m_fields->pattern = 13;
+        else if (prompt.find("underwater") != std::string::npos ||
+                 prompt.find("submarino") != std::string::npos ||
+                 prompt.find("ocean") != std::string::npos ||
+                 prompt.find("océano") != std::string::npos ||
+                 prompt.find("oceano") != std::string::npos) m_fields->pattern = 14;
+        else if (prompt.find("infernal") != std::string::npos ||
+                 prompt.find("hell") != std::string::npos ||
+                 prompt.find("demon") != std::string::npos ||
+                 prompt.find("infierno") != std::string::npos) m_fields->pattern = 15;
+        else if (prompt.find("celestial") != std::string::npos ||
+                 prompt.find("heaven") != std::string::npos ||
+                 prompt.find("angel") != std::string::npos ||
+                 prompt.find("divine") != std::string::npos ||
+                 prompt.find("celeste") != std::string::npos) m_fields->pattern = 16;
+        else if (prompt.find("industrial") != std::string::npos ||
+                 prompt.find("factory") != std::string::npos ||
+                 prompt.find("fábrica") != std::string::npos ||
+                 prompt.find("fabrica") != std::string::npos ||
+                 prompt.find("warehouse") != std::string::npos) m_fields->pattern = 17;
 
         m_fields->density = 1;
         if (prompt.find("dense") != std::string::npos ||
@@ -269,7 +307,9 @@ class $modify(ArtAgentEditorUI, EditorUI) {
         static char const* names[] = {
             "realistic architecture", "diamond trim", "ring frame", "wave trim",
             "star ornament", "linear trim", "tech circuits", "gothic arches",
-            "crystal facets", "organic curves"
+            "crystal facets", "organic curves", "steampunk gears", "sci-fi panels",
+            "ancient ruins", "neon cyberpunk", "underwater reef", "infernal spikes",
+            "celestial halos", "industrial machinery"
         };
         m_fields->previewDescription = prompt;
         m_fields->previewReady = true;
@@ -398,15 +438,119 @@ class $modify(ArtAgentEditorUI, EditorUI) {
                 float t=(x-x0)/w;
                 add(x,y0+h*(0.22f+0.06f*std::sin(t*8.f)));
                 add(x,y0+h*(0.78f+0.06f*std::sin(t*8.f+1.8f)));
-                if(m_fields->detail>=2) {
-                    add(x,y0+h*(0.5f+0.12f*std::sin(t*10.f)));
-                }
+                if(m_fields->detail>=2) add(x,y0+h*(0.5f+0.12f*std::sin(t*10.f)));
             }
-            for(float y=y0+30.f;y<y1-20.f;y+=45.f*stride) {
+            for(float y=y0+30.f;y<y1-20.f;y+=45.f*stride)
                 for(float x=x0+30.f;x<x1-20.f;x+=60.f*stride) {
                     add(x,y); add(x+12.f,y+12.f); add(x+24.f,y+18.f);
                 }
+        } else if (m_fields->pattern == 10) {
+            // Steampunk: gear-like rings, spokes and pipe runs.
+            for(float cx=x0+45.f;cx<x1;cx+=90.f*stride) {
+                for(int j=0;j<12;j+=stride) {
+                    float a=static_cast<float>(j)*3.14159265f/6.f;
+                    add(cx+24.f*std::cos(a),m_fields->layoutCenter.y+24.f*std::sin(a));
+                    if(m_fields->detail>=2) add(cx+36.f*std::cos(a),m_fields->layoutCenter.y+36.f*std::sin(a));
+                }
+                add(cx,m_fields->layoutCenter.y); add(cx-12.f,m_fields->layoutCenter.y);
+                add(cx+12.f,m_fields->layoutCenter.y);
             }
+            for(float y=y0;y<=y1;y+=30.f*stride) { add(x0,y); add(x1,y); }
+            for(float x=x0;x<=x1;x+=60.f*stride) { add(x,y0+18.f); add(x,y1-18.f); }
+        } else if (m_fields->pattern == 11) {
+            // Sci-fi: layered hull panels, vents and repeated control nodes.
+            for(float x=x0;x<=x1;x+=30.f*stride) {
+                add(x,y0); add(x,y1); add(x,y0+18.f); add(x,y1-18.f);
+                if(m_fields->detail>=2) {
+                    add(x,y0+h*0.33f); add(x,y0+h*0.66f);
+                }
+            }
+            for(float y=y0+30.f*stride;y<y1;y+=45.f*stride) {
+                add(x0,y); add(x1,y); add(x0+24.f,y); add(x1-24.f,y);
+            }
+            for(float x=x0+45.f;x<x1-20.f;x+=90.f*stride) {
+                add(x,y0+h*0.5f); add(x+12.f,y0+h*0.5f+12.f);
+                add(x+24.f,y0+h*0.5f);
+            }
+        } else if (m_fields->pattern == 12) {
+            // Ruins: broken columns, irregular lintels and scattered rubble.
+            for(float x=x0;x<=x1;x+=60.f*stride) {
+                add(x,y0); add(x,y0+18.f); add(x+12.f,y0+30.f);
+                if(m_fields->detail>=2) {
+                    add(x,y0+h*0.35f); add(x+12.f,y0+h*0.38f);
+                    add(x,y0+h*0.55f); add(x-12.f,y0+h*0.58f);
+                }
+            }
+            for(float x=x0;x<x1;x+=45.f*stride) {
+                add(x,y1); add(x+18.f,y1-12.f);
+                if(m_fields->detail>=2) add(x+30.f,y1-24.f);
+            }
+            for(float x=x0+15.f;x<x1;x+=36.f*stride)
+                for(float y=y0+15.f;y<y0+h*0.2f;y+=30.f*stride) add(x,y);
+        } else if (m_fields->pattern == 13) {
+            // Neon cyberpunk: layered rectangular frames and stepped signage.
+            for(float x=x0;x<=x1;x+=24.f*stride) {
+                add(x,y0); add(x,y1);
+                if(m_fields->detail>=2) { add(x,y0+12.f); add(x,y1-12.f); }
+            }
+            for(float y=y0;y<=y1;y+=24.f*stride) { add(x0,y); add(x1,y); }
+            for(float x=x0+30.f;x<x1-30.f;x+=75.f*stride) {
+                float cy=y0+h*0.5f;
+                add(x,cy); add(x+24.f,cy); add(x+24.f,cy+24.f);
+                add(x+48.f,cy+24.f); add(x+48.f,cy);
+                if(m_fields->detail>=3) { add(x+12.f,cy-12.f); add(x+36.f,cy+36.f); }
+            }
+        } else if (m_fields->pattern == 14) {
+            // Underwater: flowing currents, coral branches and bubble columns.
+            for(float x=x0;x<=x1;x+=30.f*stride) {
+                float t=(x-x0)/w;
+                add(x,y0+h*(0.28f+0.08f*std::sin(t*7.f)));
+                add(x,y0+h*(0.72f+0.08f*std::sin(t*7.f+2.f)));
+                if(m_fields->detail>=2) {
+                    add(x,y0+h*0.5f); add(x+12.f,y0+h*0.5f+12.f);
+                }
+            }
+            for(float x=x0+24.f;x<x1;x+=60.f*stride) {
+                for(int j=0;j<4;++j) add(x+((j%2)?12.f:-12.f)*j,y0+20.f+j*18.f);
+            }
+        } else if (m_fields->pattern == 15) {
+            // Infernal: jagged spikes, broken bands and angular flame silhouettes.
+            for(float x=x0;x<=x1;x+=30.f*stride) {
+                add(x,y0); add(x,y1);
+                add(x,y0+((static_cast<int>((x-x0)/30.f)%2)?30.f:0.f));
+                add(x,y1-((static_cast<int>((x-x0)/30.f)%2)?0.f:30.f));
+            }
+            for(float x=x0+15.f;x<x1;x+=45.f*stride) {
+                add(x,y0+h*0.4f); add(x+15.f,y0+h*0.5f);
+                add(x+30.f,y0+h*0.4f);
+                if(m_fields->detail>=2) { add(x+15.f,y0+h*0.4f+24.f); add(x+15.f,y0+h*0.4f-24.f); }
+            }
+        } else if (m_fields->pattern == 16) {
+            // Celestial: orbit-like rings, star nodes and radial connectors.
+            for(float cx=x0+45.f;cx<x1;cx+=90.f*stride) {
+                float cy=m_fields->layoutCenter.y;
+                for(int j=0;j<12;j+=stride) {
+                    float a=static_cast<float>(j)*3.14159265f/6.f;
+                    add(cx+30.f*std::cos(a),cy+30.f*std::sin(a));
+                }
+                add(cx,cy); add(cx-12.f,cy+12.f); add(cx+12.f,cy-12.f);
+            }
+            for(float x=x0;x<=x1;x+=30.f*stride) { add(x,y0); add(x,y1); }
+            for(float y=y0;y<=y1;y+=30.f*stride) { add(x0,y); add(x1,y); }
+        } else if (m_fields->pattern == 17) {
+            // Industrial: beams, rivet rows and repeated vertical supports.
+            for(float x=x0;x<=x1;x+=30.f*stride) {
+                add(x,y0); add(x,y1);
+                if(m_fields->detail>=2) { add(x+12.f,y0); add(x+12.f,y1); }
+            }
+            for(float y=y0;y<=y1;y+=30.f*stride) {
+                add(x0,y); add(x1,y);
+                if(m_fields->detail>=3) { add(x0+12.f,y); add(x1-12.f,y); }
+            }
+            for(float x=x0+60.f;x<x1;x+=90.f*stride)
+                for(float y=y0+30.f;y<y1;y+=45.f*stride) {
+                    add(x,y); add(x+12.f,y+12.f);
+                }
         } else {
             for(float x=x0; x<=x1; x+=30.f*stride) {
                 add(x,y0); add(x,y1);
