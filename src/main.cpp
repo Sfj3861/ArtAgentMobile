@@ -6,6 +6,7 @@
 #include <cctype>
 #include <cmath>
 #include <set>
+#include <vector>
 
 using namespace geode::prelude;
 
@@ -24,6 +25,7 @@ class $modify(ArtAgentEditorUI, EditorUI) {
         CCPoint layoutCenter = CCPointZero;
         float layoutMinX = 0.f, layoutMaxX = 0.f, layoutMinY = 0.f, layoutMaxY = 0.f;
         std::string previewDescription;
+        std::vector<CCPoint> layoutPoints;
     };
 
     bool init(LevelEditorLayer* editorLayer) {
@@ -181,12 +183,14 @@ class $modify(ArtAgentEditorUI, EditorUI) {
         auto arr = CCArray::create();
         if (m_selectedObjects) arr->addObjectsFromArray(m_selectedObjects);
         if (m_selectedObject && !arr->containsObject(m_selectedObject)) arr->addObject(m_selectedObject);
+        m_fields->layoutPoints.clear();
         m_fields->hasLayout = arr && arr->count() > 0;
         if (!m_fields->hasLayout) return;
         bool first = true;
         for (auto obj : CCArrayExt<GameObject*>(arr)) {
             if (!obj) continue;
             auto p = obj->getPosition();
+            m_fields->layoutPoints.push_back(p);
             if (first) {
                 m_fields->layoutMinX = m_fields->layoutMaxX = p.x;
                 m_fields->layoutMinY = m_fields->layoutMaxY = p.y;
@@ -198,7 +202,7 @@ class $modify(ArtAgentEditorUI, EditorUI) {
                 m_fields->layoutMaxY = std::max(m_fields->layoutMaxY, p.y);
             }
         }
-        m_fields->hasLayout = !first;
+        m_fields->hasLayout = !first && !m_fields->layoutPoints.empty();
         if (m_fields->hasLayout)
             m_fields->layoutCenter = CCPointMake(
                 (m_fields->layoutMinX + m_fields->layoutMaxX) / 2.f,
@@ -356,9 +360,50 @@ class $modify(ArtAgentEditorUI, EditorUI) {
             ++inserted;
         };
 
-        // Architectural blockout around the selected layout: perimeter courses,
-        // corner buttresses, window bays and progressively finer trim.
-        if (m_fields->pattern == 1) {
+        // v0.7 contour mode: infer occupied grid cells from the selected
+        // object positions, then decorate only exposed cell edges. This is a
+        // position-based approximation (not a full sprite-shape collision test).
+        if (m_fields->pattern == 0) {
+            constexpr float CELL = 30.f;
+            using Cell = std::pair<int, int>;
+            std::set<Cell> cells;
+            for (auto const& p : m_fields->layoutPoints) {
+                cells.insert({static_cast<int>(std::lround(p.x / CELL)),
+                              static_cast<int>(std::lround(p.y / CELL))});
+            }
+            const Cell neighbors[] = {{1,0},{-1,0},{0,1},{0,-1}};
+            for (auto const& cell : cells) {
+                for (auto const& n : neighbors) {
+                    Cell adjacent = {cell.first + n.first, cell.second + n.second};
+                    if (cells.find(adjacent) != cells.end()) continue;
+                    float cx = static_cast<float>(cell.first) * CELL;
+                    float cy = static_cast<float>(cell.second) * CELL;
+                    // Place a short row just outside each exposed side.
+                    if (n.first != 0) {
+                        float edgeX = cx + n.first * 18.f;
+                        add(edgeX, cy - 12.f);
+                        add(edgeX, cy);
+                        add(edgeX, cy + 12.f);
+                    } else {
+                        float edgeY = cy + n.second * 18.f;
+                        add(cx - 12.f, edgeY);
+                        add(cx, edgeY);
+                        add(cx + 12.f, edgeY);
+                    }
+                }
+            }
+            // Add a restrained second trim pass at medium/high detail.
+            if (m_fields->detail >= 2) {
+                for (auto const& cell : cells) {
+                    float cx = static_cast<float>(cell.first) * CELL;
+                    float cy = static_cast<float>(cell.second) * CELL;
+                    if (m_fields->detail >= 3) {
+                        add(cx - 12.f, cy - 12.f);
+                        add(cx + 12.f, cy + 12.f);
+                    }
+                }
+            }
+        } else if (m_fields->pattern == 1) {
             int n = std::max(2, static_cast<int>(w/60.f));
             for (int i=0; i<=n; i+=stride) {
                 float t = static_cast<float>(i)/n;
