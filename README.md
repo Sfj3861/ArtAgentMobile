@@ -1,6 +1,6 @@
 # Art Agent Mobile
 
-Native Geode mod for Geometry Dash Android 2.2081, targeting Geode 5.6.1.
+Native Geode mod for Geometry Dash Android 2.2081, targeting Geode 5.6.1. Current source version: **0.5.1**.
 
 ## Current implementation
 
@@ -8,6 +8,8 @@ Native Geode mod for Geometry Dash Android 2.2081, targeting Geode 5.6.1.
 - Prompt field with offline style keyword parsing (English and some Spanish).
 - Uses the current editor selection as a bounding area for newly generated decoration.
 - LOW / MED / HIGH detail controls.
+- Ten offline decoration patterns: architecture, diamond, ring/frame, wave, star, linear trim, tech circuits, gothic/medieval arches, crystal facets, and organic curves.
+- Detail and density affect spacing in generated patterns.
 - Architectural-style blockout generator with perimeter courses, corner supports, window-like bays and finer trim at higher detail.
 - Adds ordinary editable Geometry Dash objects; it does not intentionally modify the selected layout objects.
 - Deduplicates overlapping generated coordinates to reduce clutter at intersecting trim and frame lines.
