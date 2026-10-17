@@ -18,6 +18,10 @@ class $modify(ArtAgentEditorUI, EditorUI) {
         bool previewReady = false;
         int pattern = 0;
         int density = 1;
+        int detail = 2;
+        bool hasLayout = false;
+        CCPoint layoutCenter = CCPointZero;
+        float layoutMinX = 0.f, layoutMaxX = 0.f, layoutMinY = 0.f, layoutMaxY = 0.f;
         std::string previewDescription;
     };
 
@@ -91,7 +95,7 @@ class $modify(ArtAgentEditorUI, EditorUI) {
         }
 
         auto hint = CCLabelBMFont::create(
-            "Describe a style, then preview before inserting native objects.",
+            "Select layout objects first; decoration will follow their bounds.",
             "chatFont.fnt");
         if (hint) {
             hint->setScale(0.48f);
@@ -102,7 +106,7 @@ class $modify(ArtAgentEditorUI, EditorUI) {
 
         auto input = CCTextInputNode::create(
             panel->getContentSize().width - 32.f, 30.f,
-            "neon blue tech blocks with glowing edges", "bigFont.fnt");
+            "realistic stone facade with layered trim and window recesses", "bigFont.fnt");
         if (input) {
             input->setPosition({panel->getContentSize().width / 2.f,
                 panel->getContentSize().height - 88.f});
@@ -111,7 +115,7 @@ class $modify(ArtAgentEditorUI, EditorUI) {
         }
 
         auto status = CCLabelBMFont::create(
-            "Ready. Preview creates a plan; Insert adds editable GD blocks.",
+            "Select layout objects, choose detail, then preview.",
             "chatFont.fnt");
         if (status) {
             status->setScale(0.48f);
@@ -127,6 +131,9 @@ class $modify(ArtAgentEditorUI, EditorUI) {
             auto previewLabel = CCLabelBMFont::create("PREVIEW", "bigFont.fnt");
             auto insertLabel = CCLabelBMFont::create("INSERT", "bigFont.fnt");
             auto closeLabel = CCLabelBMFont::create("CLOSE", "bigFont.fnt");
+            auto lowLabel = CCLabelBMFont::create("LOW", "bigFont.fnt");
+            auto medLabel = CCLabelBMFont::create("MED", "bigFont.fnt");
+            auto highLabel = CCLabelBMFont::create("HIGH", "bigFont.fnt");
             if (previewLabel) {
                 previewLabel->setScale(0.55f);
                 auto item = CCMenuItemLabel::create(previewLabel, this,
@@ -148,11 +155,54 @@ class $modify(ArtAgentEditorUI, EditorUI) {
                 item->setPosition({panel->getContentSize().width * 0.82f, 22.f});
                 menu->addChild(item);
             }
+            auto addDetail = [&](CCLabelBMFont* label, float x, SEL_MenuHandler handler) {
+                if (!label) return;
+                label->setScale(0.43f);
+                auto item = CCMenuItemLabel::create(label, this, handler);
+                item->setPosition({x, 49.f});
+                menu->addChild(item);
+            };
+            addDetail(lowLabel, panel->getContentSize().width * 0.27f, menu_selector(ArtAgentEditorUI::onDetailLow));
+            addDetail(medLabel, panel->getContentSize().width * 0.40f, menu_selector(ArtAgentEditorUI::onDetailMed));
+            addDetail(highLabel, panel->getContentSize().width * 0.53f, menu_selector(ArtAgentEditorUI::onDetailHigh));
             panel->addChild(menu);
         }
 
         this->addChild(panel);
         m_fields->panel = panel;
+    }
+
+    void onDetailLow(CCObject*) { m_fields->detail = 1; this->setStatus("Detail LOW selected."); }
+    void onDetailMed(CCObject*) { m_fields->detail = 2; this->setStatus("Detail MEDIUM selected."); }
+    void onDetailHigh(CCObject*) { m_fields->detail = 3; this->setStatus("Detail HIGH selected."); }
+
+    void captureSelectedLayout() {
+        auto arr = CCArray::create();
+        if (m_selectedObjects) arr->addObjectsFromArray(m_selectedObjects);
+        if (m_selectedObject && !arr->containsObject(m_selectedObject)) arr->addObject(m_selectedObject);
+        m_fields->hasLayout = arr && arr->count() > 0;
+        if (!m_fields->hasLayout) return;
+        bool first = true;
+        CCObject* raw = nullptr;
+        CCARRAY_FOREACH(arr, raw) {
+            auto obj = typeinfo_cast<GameObject*>(raw);
+            if (!obj) continue;
+            auto p = obj->getPosition();
+            if (first) {
+                m_fields->layoutMinX = m_fields->layoutMaxX = p.x;
+                m_fields->layoutMinY = m_fields->layoutMaxY = p.y;
+                first = false;
+            } else {
+                m_fields->layoutMinX = std::min(m_fields->layoutMinX, p.x);
+                m_fields->layoutMaxX = std::max(m_fields->layoutMaxX, p.x);
+                m_fields->layoutMinY = std::min(m_fields->layoutMinY, p.y);
+                m_fields->layoutMaxY = std::max(m_fields->layoutMaxY, p.y);
+            }
+        }
+        m_fields->hasLayout = !first;
+        if (m_fields->hasLayout)
+            m_fields->layoutCenter = {(m_fields->layoutMinX + m_fields->layoutMaxX) / 2.f,
+                                      (m_fields->layoutMinY + m_fields->layoutMaxY) / 2.f};
     }
 
     void onPreview(CCObject*) {
@@ -166,7 +216,12 @@ class $modify(ArtAgentEditorUI, EditorUI) {
 
         // A small offline prompt parser maps common style words to deterministic
         // editable patterns. It does not pretend to be a remote AI model.
-        m_fields->pattern = 0; // tech/grid
+        this->captureSelectedLayout();
+        if (!m_fields->hasLayout) {
+            this->setStatus("Select the layout objects in the editor first.");
+            return;
+        }
+        m_fields->pattern = 0; // realistic architecture default
         if (prompt.find("diamond") != std::string::npos ||
             prompt.find("diamante") != std::string::npos) m_fields->pattern = 1;
         else if (prompt.find("circle") != std::string::npos ||
@@ -192,92 +247,87 @@ class $modify(ArtAgentEditorUI, EditorUI) {
             prompt.find("pocos") != std::string::npos ||
             prompt.find("simple") != std::string::npos) m_fields->density = 0;
 
-        static char const* names[] = {"tech grid", "diamond", "ring", "wave", "star", "line"};
+        static char const* names[] = {"realistic architecture", "diamond trim", "ring frame", "wave trim", "star ornament", "linear trim"};
         m_fields->previewDescription = prompt;
         m_fields->previewReady = true;
         this->setStatus((std::string("Plan: ") + names[m_fields->pattern] +
             (m_fields->density == 2 ? " / dense" : m_fields->density == 0 ? " / sparse" : " / normal") +
-            ". INSERT adds native blocks.").c_str());
+            ". INSERT decorates around selected layout.").c_str());
     }
 
     void onInsert(CCObject*) {
         if (!m_fields->previewReady) {
-            this->setStatus("Press PREVIEW first, then INSERT.");
+            this->setStatus("Press PREVIEW first.");
             return;
         }
-
-        int inserted = 0;
-        constexpr float spacing = 30.f;
-        auto add = [&](float x, float y) {
-            this->createObject(1, CCPoint(x, y));
-            ++inserted;
-        };
-        int step = m_fields->density == 2 ? 1 : m_fields->density == 0 ? 3 : 2;
-
-        // The design is generated locally, without an API key or network.
-        // All pieces are normal GD block objects, so they remain editable.
-        switch (m_fields->pattern) {
-            case 1: { // diamond outline
-                for (int d = 0; d <= 4; d += step) {
-                    add(180.f + d * spacing, 180.f + (4 - d) * spacing);
-                    add(180.f + d * spacing, 180.f - (4 - d) * spacing);
-                    if (d != 0 && d != 4) {
-                        add(180.f - d * spacing, 180.f + (4 - d) * spacing);
-                        add(180.f - d * spacing, 180.f - (4 - d) * spacing);
-                    }
-                }
-                break;
-            }
-            case 2: { // square-ish ring
-                for (int i = -4; i <= 4; i += step) {
-                    add(180.f + i * spacing, 180.f + 4 * spacing);
-                    add(180.f + i * spacing, 180.f - 4 * spacing);
-                    add(180.f + 4 * spacing, 180.f + i * spacing);
-                    add(180.f - 4 * spacing, 180.f + i * spacing);
-                }
-                break;
-            }
-            case 3: { // zigzag / wave
-                for (int i = 0; i < 13; i += step) {
-                    float y = 180.f + ((i % 4 < 2) ? 1.f : -1.f) * (i % 2 ? 30.f : 60.f);
-                    add(100.f + i * spacing, y);
-                    if (m_fields->density == 2) add(100.f + i * spacing, y + 30.f);
-                }
-                break;
-            }
-            case 4: { // pixel star
-                int const points[][2] = {{0,3},{0,2},{-1,1},{-2,1},{-1,0},{-1,-1},{0,-2},{1,-1},{1,0},{2,1},{1,1},{0,1}};
-                for (auto const& p : points) {
-                    add(210.f + p[0] * spacing, 180.f + p[1] * spacing);
-                    if (m_fields->density == 2)
-                        add(210.f + p[0] * spacing + 12.f, 180.f + p[1] * spacing + 12.f);
-                }
-                break;
-            }
-            case 5: { // horizontal rails
-                int count = m_fields->density == 0 ? 5 : m_fields->density == 2 ? 15 : 9;
-                for (int i = 0; i < count; ++i) {
-                    add(100.f + i * spacing, 150.f);
-                    add(100.f + i * spacing, 210.f);
-                }
-                break;
-            }
-            default: { // layered tech grid with an open center
-                int radius = m_fields->density == 0 ? 2 : m_fields->density == 2 ? 5 : 3;
-                for (int row = -radius; row <= radius; ++row) {
-                    for (int col = -radius; col <= radius; ++col) {
-                        if (row == 0 && col == 0) continue;
-                        if ((std::abs(row) + std::abs(col)) % step != 0 &&
-                            m_fields->density != 2) continue;
-                        add(180.f + col * spacing, 180.f + row * spacing);
-                    }
-                }
-                break;
-            }
+        this->captureSelectedLayout();
+        if (!m_fields->hasLayout) {
+            this->setStatus("Select layout objects first. Nothing inserted.");
+            return;
         }
-        m_fields->previewReady = false;
-        this->setStatus(("Inserted " + std::to_string(inserted) +
-            " editable blocks. Save/check placement; this offline generator does not preserve selection groups automatically.").c_str());
+        int inserted = 0;
+        float x0 = m_fields->layoutMinX - 30.f;
+        float x1 = m_fields->layoutMaxX + 30.f;
+        float y0 = m_fields->layoutMinY - 30.f;
+        float y1 = m_fields->layoutMaxY + 30.f;
+        float w = std::max(90.f, x1-x0), h = std::max(60.f, y1-y0);
+        int stride = m_fields->detail == 1 ? 3 : m_fields->detail == 2 ? 2 : 1;
+        auto add = [&](float x, float y) { this->createObject(1, CCPoint(x,y)); ++inserted; };
+
+        // Architectural blockout around the selected layout: perimeter courses,
+        // corner buttresses, window bays and progressively finer trim.
+        if (m_fields->pattern == 1) {
+            int n = std::max(2, static_cast<int>(w/60.f));
+            for (int i=0; i<=n; i+=stride) {
+                float t = static_cast<float>(i)/n;
+                float off = (0.5f-std::abs(t-0.5f))*h*0.7f;
+                add(x0+t*w, (y0+y1)/2.f+off);
+                add(x0+t*w, (y0+y1)/2.f-off);
+            }
+        } else if (m_fields->pattern == 2 || m_fields->pattern == 5) {
+            for(float x=x0; x<=x1; x+=30.f*stride) { add(x,y0); add(x,y1); }
+            for(float y=y0; y<=y1; y+=30.f*stride) { add(x0,y); add(x1,y); }
+        } else if (m_fields->pattern == 3) {
+            for(float x=x0; x<=x1; x+=30.f*stride) {
+                float t=(x-x0)/w;
+                add(x,y0+h*(0.35f+0.12f*std::sin(t*12.f)));
+                if(m_fields->detail>=2) add(x,y0+h*(0.65f+0.1f*std::sin(t*12.f+1.5f)));
+            }
+        } else if (m_fields->pattern == 4) {
+            const int pts[][2]={{0,3},{1,1},{3,0},{1,-1},{0,-3},{-1,-1},{-3,0},{-1,1}};
+            for(auto const& p:pts) add(m_fields->layoutCenter.x+p[0]*30.f,m_fields->layoutCenter.y+p[1]*30.f);
+        } else {
+            for(float x=x0; x<=x1; x+=30.f*stride) {
+                add(x,y0); add(x,y1);
+                if(m_fields->detail>=2) { add(x,y0+12.f); add(x,y1-12.f); }
+            }
+            for(float y=y0; y<=y1; y+=30.f*stride) {
+                add(x0,y); add(x1,y);
+                if(m_fields->detail>=3) { add(x0+12.f,y); add(x1-12.f,y); }
+            }
+            float pierStep=std::max(90.f,w/(m_fields->detail==1?3.f:m_fields->detail==2?5.f:7.f));
+            for(float x=x0+pierStep; x<x1; x+=pierStep)
+                for(float y=y0+30.f; y<y1-15.f; y+=30.f*stride) {
+                    add(x,y);
+                    if(m_fields->detail>=2) add(x+12.f,y);
+                }
+            float bayW=std::max(60.f,w/(m_fields->detail==1?4.f:m_fields->detail==2?6.f:8.f));
+            for(float x=x0+20.f; x+bayW<x1; x+=bayW) {
+                float bot=y0+h*0.34f, top=y0+h*0.72f;
+                for(float xx=x; xx<=x+bayW*0.55f; xx+=30.f*stride) { add(xx,bot); add(xx,top); }
+                add(x,(top+bot)/2.f); add(x+bayW*0.55f,(top+bot)/2.f);
+                if(m_fields->detail>=3) { add(x,bot-12.f); add(x+bayW*0.55f,bot-12.f); add(x,top+12.f); add(x+bayW*0.55f,top+12.f); }
+            }
+            for(int k=0;k<4;++k) {
+                float x=(k<2)?x0:x1, y=(k%2==0)?y0:y1;
+                for(int j=0;j<(m_fields->detail==1?2:m_fields->detail==2?3:5);++j)
+                    add(x+((k<2)?1.f:-1.f)*j*12.f,y+((k%2==0)?1.f:-1.f)*j*12.f);
+            }
+            if(m_fields->detail>=3)
+                for(float x=x0;x<=x1;x+=15.f) { add(x,y1+12.f); add(x,y0-12.f); }
+        }
+        m_fields->previewReady=false;
+        this->setStatus(("Added "+std::to_string(inserted)+" editable decoration blocks around selected layout. The layout itself was not edited; inspect before saving.").c_str());
     }
 
     void onClosePanel(CCObject*) {
