@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cmath>
+#include <set>
 
 using namespace geode::prelude;
 
@@ -266,13 +267,30 @@ class $modify(ArtAgentEditorUI, EditorUI) {
             return;
         }
         int inserted = 0;
+        constexpr int MAX_GENERATED_OBJECTS = 1200;
+        std::set<std::pair<int, int>> occupied;
+        bool reachedLimit = false;
         float x0 = m_fields->layoutMinX - 30.f;
         float x1 = m_fields->layoutMaxX + 30.f;
         float y0 = m_fields->layoutMinY - 30.f;
         float y1 = m_fields->layoutMaxY + 30.f;
         float w = std::max(90.f, x1-x0), h = std::max(60.f, y1-y0);
         int stride = m_fields->detail == 1 ? 3 : m_fields->detail == 2 ? 2 : 1;
-        auto add = [&](float x, float y) { this->createObject(1, CCPoint(x,y)); ++inserted; };
+        auto add = [&](float x, float y) {
+            if (inserted >= MAX_GENERATED_OBJECTS) {
+                reachedLimit = true;
+                return;
+            }
+            // Prevent overlapping duplicates caused by intersections between
+            // borders, bays and trim. Quantization keeps the check deterministic.
+            auto key = std::make_pair(
+                static_cast<int>(std::lround(x * 10.f)),
+                static_cast<int>(std::lround(y * 10.f))
+            );
+            if (!occupied.insert(key).second) return;
+            this->createObject(1, CCPoint(x, y));
+            ++inserted;
+        };
 
         // Architectural blockout around the selected layout: perimeter courses,
         // corner buttresses, window bays and progressively finer trim.
@@ -327,7 +345,11 @@ class $modify(ArtAgentEditorUI, EditorUI) {
                 for(float x=x0;x<=x1;x+=15.f) { add(x,y1+12.f); add(x,y0-12.f); }
         }
         m_fields->previewReady=false;
-        this->setStatus(("Added "+std::to_string(inserted)+" editable decoration blocks around selected layout. The layout itself was not edited; inspect before saving.").c_str());
+        std::string result = "Added " + std::to_string(inserted) +
+            " unique editable decoration blocks around the selected layout.";
+        if (reachedLimit) result += " Safety cap reached (1200 objects); reduce detail or split the selection.";
+        result += " Original layout objects were not intentionally modified; inspect before saving.";
+        this->setStatus(result.c_str());
     }
 
     void onClosePanel(CCObject*) {
