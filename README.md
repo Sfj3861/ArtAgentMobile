@@ -1,6 +1,6 @@
 # Art Agent Mobile
 
-Native Geode mod for Geometry Dash Android 2.2081, targeting Geode 5.6.1. Current source version: **0.7.0**.
+Native Geode mod for Geometry Dash Android 2.2081, targeting Geode 5.6.1. Current source version: **0.8.0**.
 
 ## Current implementation
 
@@ -9,8 +9,10 @@ Native Geode mod for Geometry Dash Android 2.2081, targeting Geode 5.6.1. Curren
 - Uses the current editor selection to derive bounds and, for the default architecture style, estimates occupied 30-unit grid cells and decorates exposed edges to better follow irregular layouts.
 - The contour pass is position-based and approximate; it does not inspect exact sprite collision shapes or rotated/scaled object bounds.
 - LOW / MED / HIGH detail controls.
+- Plan preview reports the parsed style, density, and variation seed before insertion; it does not render ghost objects.
+- NEW SEED changes the deterministic variation used for the optional accent pass. The same prompt and seed produce repeatable accents.
 - Eighteen offline decoration patterns: architecture, diamond, ring/frame, wave, star, linear trim, tech circuits, gothic/medieval arches, crystal facets, organic curves, steampunk gears, sci-fi panels, ancient ruins, neon cyberpunk, underwater reef, infernal spikes, celestial halos, and industrial machinery.
-- Detail and density affect spacing in generated patterns.
+- Detail and density affect spacing in generated patterns and the number of seeded accents.
 - Architectural-style blockout generator with perimeter courses, corner supports, window-like bays and finer trim at higher detail.
 - Adds ordinary editable Geometry Dash objects; it does not intentionally modify the selected layout objects.
 - Deduplicates overlapping generated coordinates to reduce clutter at intersecting trim and frame lines.
@@ -19,7 +21,7 @@ Native Geode mod for Geometry Dash Android 2.2081, targeting Geode 5.6.1. Curren
 
 ## Important limitations
 
-This is an early procedural decorator, not a full image-generating AI. “Realistic” currently means architectural structure suggested with repeated native block objects; it does not yet create advanced textured materials, lighting, shadows, custom color channels, or a true visual preview. The selected objects are used to calculate a bounding rectangle, so irregular layouts may receive imperfect decoration. The default architecture style now adds a position-grid contour pass, but this is an approximation and other styles still use the selected bounds. Generated objects do not yet inherit Group IDs, Editor Layer assignments, Hide behavior, or trigger relationships automatically. Review the result before saving, and keep a backup of important levels.
+This is an early procedural decorator, not a full image-generating AI. “Realistic” currently means architectural structure suggested with repeated native block objects; it does not yet create advanced textured materials, lighting, shadows, custom color channels, or a true visual preview. The selected objects are used to calculate a bounding rectangle, so irregular layouts may receive imperfect decoration. The default architecture style now adds a position-grid contour pass, but this is an approximation and other styles still use the selected bounds. The preview is descriptive rather than a live ghost-object preview. This version does not yet provide a dedicated safe remove-last-generation command. Generated objects do not yet inherit Group IDs, Editor Layer assignments, Hide behavior, or trigger relationships automatically. Review the result before saving, and keep a backup of important levels.
 
 The newest source commits trigger Android32 and Android64 builds through GitHub Actions. Check the latest run before installing; a successful compile alone does not prove in-game behavior.
 
