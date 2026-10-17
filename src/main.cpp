@@ -183,9 +183,7 @@ class $modify(ArtAgentEditorUI, EditorUI) {
         m_fields->hasLayout = arr && arr->count() > 0;
         if (!m_fields->hasLayout) return;
         bool first = true;
-        CCObject* raw = nullptr;
-        CCARRAY_FOREACH(arr, raw) {
-            auto obj = typeinfo_cast<GameObject*>(raw);
+        for (auto obj : CCArrayExt<GameObject*>(arr)) {
             if (!obj) continue;
             auto p = obj->getPosition();
             if (first) {
@@ -201,8 +199,10 @@ class $modify(ArtAgentEditorUI, EditorUI) {
         }
         m_fields->hasLayout = !first;
         if (m_fields->hasLayout)
-            m_fields->layoutCenter = {(m_fields->layoutMinX + m_fields->layoutMaxX) / 2.f,
-                                      (m_fields->layoutMinY + m_fields->layoutMaxY) / 2.f};
+            m_fields->layoutCenter = CCPointMake(
+                (m_fields->layoutMinX + m_fields->layoutMaxX) / 2.f,
+                (m_fields->layoutMinY + m_fields->layoutMaxY) / 2.f
+            );
     }
 
     void onPreview(CCObject*) {
