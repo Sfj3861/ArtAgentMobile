@@ -1,47 +1,24 @@
 # Art Agent Mobile
 
-A free, Android-first decoration-generator workflow for Geometry Dash **2.2081**, built as a native Geode mod.
+Native Geode mod for Geometry Dash Android 2.2081, targeting Geode 5.6.1.
 
-## Current status
+## Current implementation
 
-This is an early prototype, not a finished generator.
+- Editor-only Art Agent shortcut and keyboard binding configuration.
+- Prompt field and in-editor panel.
+- Preview/insert workflow for a simple, fixed pattern of native block objects.
+- GitHub Actions workflow targeting Android32 and Android64.
 
-- [x] Geode project metadata for Android / Geometry Dash 2.2081
-- [x] Cloud build workflow for Android32 and Android64
-- [x] Editor-only Art Agent floating entry button
-- [x] Cyan/pink accent choice in mod settings
-- [x] Prototype panel explaining the intended decoration workflow
-- [ ] Draggable floating button and configurable keyboard shortcut
-- [ ] Actual prompt input (English first; Spanish and French later)
-- [ ] Target-layer picker and selected-object capture
-- [ ] Prompt-to-decoration generator
-- [ ] Preview generated objects before insertion
-- [ ] Insert native Geometry Dash editor objects
-- [ ] Group ID preservation and Hide-layout compatibility
-- [ ] Image-to-decoration workflow
+## Known limitations — not a complete release
 
-## Intended workflow
+This repository does NOT yet implement the complete Art Agent specification. The current preview is only a message describing a fixed pattern; it is not a true rendered preview of the exact inserted objects. The current insert operation creates a fixed pattern of block objects at a fixed coordinate, regardless of prompt meaning. It does not capture the current selection, adapt decoration to existing geometry, provide a target-layer picker, preserve Group IDs or Hide relationships, create a draggable floating button, or provide robust undo/transaction handling. These capabilities must not be represented as finished.
 
-1. Open a level in the editor and press the floating Art Agent button.
-2. Select the existing objects to decorate and choose a target editor layer.
-3. Describe the desired decoration in English (initial language).
-4. Review a preview, then insert generated native Geometry Dash objects.
+The current code is a development build and must be compiled and tested on both Android architectures and then tested in Geometry Dash before it can be described as ready to install.
 
-Steps 2-4 describe the intended workflow; they are not implemented yet in this prototype. The current panel only explains them.
+## Build
 
-## Build on GitHub Actions
+Open Actions → Build Android Geode mod. Successful jobs upload .geode artifacts for Android32 and Android64. A successful compile alone does not prove in-game behavior.
 
-Open the **Actions** tab and select **Build Android Geode mod**. The workflow builds Android32 and Android64 packages and uploads the `.geode` files as artifacts.
+## Design requirements
 
-## Design goals
-
-- Android-first; do not require a local PC.
-- Generate ordinary Geometry Dash objects rather than a custom level format.
-- Preview before insertion and avoid silently overwriting level content.
-- Preserve the original layout's Hide property and reuse corresponding Group IDs for decoration, when applicable.
-- Start with English prompts; consider Spanish and French after the initial workflow is stable.
-- Keep the generator modular so a local or remote generation backend can be added later.
-
-## Important
-
-The current build adds an editor button and a prototype information panel only. It does **not** generate or insert decoration, select layers, capture selected objects, support dragging, or handle a keyboard shortcut yet. A successful build does not prove those planned features are complete.
+The intended finished mod should provide prompt-based generation of editable native Geometry Dash objects, preview the generated objects before insertion, operate on user-selected geometry, and preserve relevant Group IDs and Hide/layout behavior without damaging unrelated level content. It should be free to use and not require paid APIs or ads.
