@@ -1,14 +1,14 @@
 # Art Agent Mobile
 
-Native Geode mod for Geometry Dash Android 2.2081, targeting Geode 5.6.1. Current source version: **0.5.1**.
+Native Geode mod for Geometry Dash Android 2.2081, targeting Geode 5.6.1. Current source version: **0.6.0**.
 
 ## Current implementation
 
 - Editor-only floating shortcut and configurable keyboard binding.
-- Prompt field with offline style keyword parsing (English and some Spanish).
+- Prompt field with offline style and substyle keyword parsing (English and Spanish terms). Steampunk supports clockwork/gear wording; sci-fi supports futuristic/spaceship wording; ruins support abandoned structures; cyberpunk supports neon; underwater supports ocean themes; infernal supports demon/hell themes; celestial supports angel/heaven themes; industrial supports factory/warehouse themes.
 - Uses the current editor selection as a bounding area for newly generated decoration.
 - LOW / MED / HIGH detail controls.
-- Ten offline decoration patterns: architecture, diamond, ring/frame, wave, star, linear trim, tech circuits, gothic/medieval arches, crystal facets, and organic curves.
+- Eighteen offline decoration patterns: architecture, diamond, ring/frame, wave, star, linear trim, tech circuits, gothic/medieval arches, crystal facets, organic curves, steampunk gears, sci-fi panels, ancient ruins, neon cyberpunk, underwater reef, infernal spikes, celestial halos, and industrial machinery.
 - Detail and density affect spacing in generated patterns.
 - Architectural-style blockout generator with perimeter courses, corner supports, window-like bays and finer trim at higher detail.
 - Adds ordinary editable Geometry Dash objects; it does not intentionally modify the selected layout objects.
