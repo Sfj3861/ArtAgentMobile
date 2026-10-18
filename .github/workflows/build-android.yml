@@ -28,9 +28,31 @@ jobs:
           sdk: given
           target: ${{ matrix.target }}
 
+      - name: Validate Geode package
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          packages=(output/*.geode)
+          if [ "${#packages[@]}" -ne 1 ]; then
+            echo "::error::Expected exactly one .geode package, found ${#packages[@]}."
+            printf '%s\n' "${packages[@]}"
+            exit 1
+          fi
+          package="${packages[0]}"
+          test -s "$package"
+          unzip -t "$package"
+          echo "Package: $package"
+          echo "Size: $(stat -c%s "$package") bytes"
+          unzip -l "$package"
+          if ! unzip -Z1 "$package" | grep -Eq '(^|/)mod\.json$'; then
+            echo "::error::The .geode package does not contain mod.json."
+            exit 1
+          fi
+
       - name: Upload .geode package
         uses: actions/upload-artifact@v4
         with:
-          name: ArtAgentMobile-${{ matrix.target }}
+          name: ArtAgentMobile-${{ matrix.target }}-v0.9.1
           path: output/*.geode
           if-no-files-found: error
