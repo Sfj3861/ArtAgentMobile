@@ -9,7 +9,7 @@
 
     <application
         android:allowBackup="false"
-        android:label="C to Triggers Launcher"
+        android:label="GPTM - GPT Mod Menu"
         android:theme="@android:style/Theme.Material.Light.NoActionBar"
         android:usesCleartextTraffic="false">
         <activity
