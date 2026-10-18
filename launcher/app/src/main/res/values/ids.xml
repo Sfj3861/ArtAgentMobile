@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="overlay_touch_x" type="id" />
+    <item name="overlay_touch_y" type="id" />
+    <item name="overlay_start_x" type="id" />
+    <item name="overlay_start_y" type="id" />
+</resources>
