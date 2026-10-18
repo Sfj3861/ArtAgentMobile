@@ -1,6 +1,6 @@
 # Art Agent Mobile
 
-Native Geode mod for Geometry Dash Android 2.2081, targeting Geode 5.6.1. Current source version: **0.8.1**.
+Native Geode mod for Geometry Dash Android 2.2081, targeting Geode 5.6.1. Current source version: **0.9.0**.
 
 ## Current implementation
 
@@ -10,7 +10,8 @@ Native Geode mod for Geometry Dash Android 2.2081, targeting Geode 5.6.1. Curren
 - The contour pass is position-based and approximate; it does not inspect exact sprite collision shapes or rotated/scaled object bounds.
 - LOW / MED / HIGH detail controls.
 - Plan preview reports the parsed style, density, and variation seed before insertion; it does not render ghost objects.
-- NEW SEED changes the deterministic variation used for the optional accent pass. The same prompt and seed produce repeatable accents. In v0.8.1, the prompt hash is combined during generation instead of overwriting the user seed, so NEW SEED changes the result after PREVIEW.
+- v0.9.0 adds an approximate generated-object count to PREVIEW, so you can judge likely complexity before INSERT. The count is a heuristic, not an exact promise; styles differ and duplicate coordinates are removed during insertion.
+- NEW SEED changes the deterministic variation used for the optional accent pass. The same prompt and seed produce repeatable accents. In v0.8.1+, the prompt hash is combined during generation instead of overwriting the user seed, so NEW SEED changes the result after PREVIEW.
 - Eighteen offline decoration patterns: architecture, diamond, ring/frame, wave, star, linear trim, tech circuits, gothic/medieval arches, crystal facets, organic curves, steampunk gears, sci-fi panels, ancient ruins, neon cyberpunk, underwater reef, infernal spikes, celestial halos, and industrial machinery.
 - Detail and density affect spacing in generated patterns and the number of seeded accents.
 - Architectural-style blockout generator with perimeter courses, corner supports, window-like bays and finer trim at higher detail.
@@ -21,7 +22,7 @@ Native Geode mod for Geometry Dash Android 2.2081, targeting Geode 5.6.1. Curren
 
 ## Important limitations
 
-This is an early procedural decorator, not a full image-generating AI. “Realistic” currently means architectural structure suggested with repeated native block objects; it does not yet create advanced textured materials, lighting, shadows, custom color channels, or a true visual preview. The selected objects are used to calculate a bounding rectangle, so irregular layouts may receive imperfect decoration. The default architecture style now adds a position-grid contour pass, but this is an approximation and other styles still use the selected bounds. The preview is descriptive rather than a live ghost-object preview. This version does not yet provide a dedicated safe remove-last-generation command. Generated objects do not yet inherit Group IDs, Editor Layer assignments, Hide behavior, or trigger relationships automatically. Review the result before saving, and keep a backup of important levels.
+This is an early procedural decorator, not a full image-generating AI. “Realistic” currently means architectural structure suggested with repeated native block objects; it does not yet create advanced textured materials, lighting, shadows, custom color channels, or a true visual preview. The selected objects are used to calculate a bounding rectangle, so irregular layouts may receive imperfect decoration. The default architecture style now adds a position-grid contour pass, but this is an approximation and other styles still use the selected bounds. The preview is descriptive rather than a live ghost-object preview; the v0.9.0 object count is only an estimate. This version does not yet provide a dedicated safe remove-last-generation command. Generated objects do not yet inherit Group IDs, Editor Layer assignments, Hide behavior, or trigger relationships automatically. Review the result before saving, and keep a backup of important levels.
 
 The newest source commits trigger Android32 and Android64 builds through GitHub Actions. Check the latest run before installing; a successful compile alone does not prove in-game behavior.
 
