@@ -5,11 +5,14 @@ This is a separate Android app project in the ArtAgentMobile repository. It is d
 ## What it currently does
 
 - Provides a launcher screen with an **Open Geometry Dash** button.
-- Can request Android's explicit **Display over other apps** permission and show a movable floating C→T button.
-- The floating button is only a UI placeholder at this stage.
-- The launcher tries to open the installed package `com.robtopx.geometryjump`. If your game build uses a different package ID, the launch button will report that it cannot find the app.
+- Can request Android's explicit **Display over other apps** permission and show a movable floating **GPTM** button.
+- Tapping GPTM opens a panel with practice/player, visuals/HUD, and editor/tools categories.
+- The switches are interface placeholders only; they do not change Geometry Dash gameplay yet.
+- The launcher tries to open the installed package `com.robtopx.geometryjump`. If your build uses a different package ID, the launch button will report that it cannot find the app.
 
-## Important: injection is not implemented
+See [GPTM roadmap](../docs/GPTM_ROADMAP.md) for the planned feature set and integration stages.
+
+## Important: native integration is not implemented
 
 Android apps are sandboxed. A normal launcher cannot grant itself “absolute permission” over Geometry Dash or inject native code into its process just by starting the game. The overlay permission only allows a window to be drawn over other apps; it does not grant process access. This prototype does **not** patch the game, inject a library, execute arbitrary C code, or create Geometry Dash triggers yet. GPTM's current switches only demonstrate the interface and are not functional game mods. Opening Geometry Dash directly will not activate any injection because there is no injector in this build.
 
