@@ -4,12 +4,14 @@ GPTM is the planned all-in-one quality-of-life and testing menu for the ArtAgent
 
 ## Current prototype
 
-The Android overlay now displays a GPTM panel with grouped switches for:
-- Practice/player: practice checkpoints, auto-retry, practice music sync, noclip testing, ignore-damage testing, speed control.
-- Visuals/HUD: FPS, hitboxes, attempt count, screen shake, progress.
-- Editor/tools: C-to-Triggers translator, object ID inspector, level stats, layout helper.
+The Android overlay now displays a GPTM panel with grouped switches covering these planned areas:
+- Player/practice: checkpoints, Start Position helper, auto-retry, practice music sync, noclip testing, ignore-damage testing, speed/TPS controls, trajectory and input display.
+- Visuals/HUD: FPS, hitboxes, attempts, screen shake/pulses/particles, low-detail helper, progress, click indicator and layout visibility.
+- Editor/build: C-to-Triggers, object/group ID helpers, copy/paste and free-move helpers, rotation helper, trigger-plan preview, object count and layout helper.
+- Level/QoL: level ID and stats, song info, quick restart, hiding the menu during gameplay, saved preferences.
+- Diagnostics: compatibility report, native integration status and debug logging.
 
-**These are UI placeholders.** Their switches currently only change their displayed state and show a notice; they do not alter Geometry Dash gameplay. The current launcher is not a native mod loader and does not inject into the game's process.
+**These are UI placeholders.** Their switches currently only change their displayed state and show a notice; they do not alter Geometry Dash gameplay. The current launcher is not a native mod loader and does not inject into the game's process. This is a broad feature roadmap, not a claim of one-to-one parity with every release of Eclipse, Mega Hack or QOLmod.
 
 ## Compatibility gate
 
