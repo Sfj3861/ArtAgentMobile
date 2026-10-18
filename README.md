@@ -34,3 +34,12 @@ Open Actions → Build Android Geode mod. Successful jobs upload .geode artifact
 ## Experimental C-to-Triggers parser
 
 The repository now also contains an isolated first parser prototype in `src/CCodeTranslator.hpp` and `src/CCodeTranslator.cpp`, with the supported syntax documented in `docs/C_TO_TRIGGERS.md`. It validates a deliberately limited C-like command list and returns a trigger plan; it does not execute arbitrary C code. **This is not yet an in-editor translator UI and does not yet create Geometry Dash trigger objects.** Those are the next implementation steps. The module is compiled into the existing native target, but its runtime integration and in-game behavior have not been verified.
+
+
+## Experimental standalone Android launcher
+
+A separate launcher prototype now lives in `launcher/`. It targets Geometry Dash Android 2.2090 as a starting point, opens the installed game, and can show a movable floating button after the user grants Android's **Display over other apps** permission. It does not require Geode to launch the game.
+
+**Important:** the floating button is currently a UI placeholder. This launcher does not inject native code, patch Geometry Dash, or generate trigger objects. Android's overlay permission does not grant access to another app's process. See [launcher documentation](launcher/README.md).
+
+To build it, open **Actions → Build C to Triggers Launcher APK**, run the workflow, then download the `c-to-triggers-launcher-debug-apk` artifact from a successful run. The APK has not yet been built or tested on a device.
