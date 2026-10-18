@@ -25,12 +25,12 @@ class LauncherActivity : Activity() {
         }
 
         val title = TextView(this).apply {
-            text = "C to Triggers"
-            textSize = 28f
+            text = "GPTM • GPT Mod Menu"
+            textSize = 26f
             gravity = Gravity.CENTER
         }
         val subtitle = TextView(this).apply {
-            text = "Launcher experimental para Geometry Dash 2.2090\n\nEste prototipo abre el juego y puede mostrar un botón flotante. Todavía no inyecta código ni crea triggers dentro del juego."
+            text = "C to Triggers + GPTM para Geometry Dash 2.2090\n\nEl botón flotante abre el prototipo del menú. Sus opciones todavía no modifican el juego: falta implementar y probar la integración nativa."
             textSize = 16f
             gravity = Gravity.CENTER
             setPadding(0, 16, 0, 24)
@@ -40,14 +40,14 @@ class LauncherActivity : Activity() {
             setOnClickListener { launchGame() }
         }
         val enableOverlay = Button(this).apply {
-            text = "ACTIVAR BOTÓN FLOTANTE"
+            text = "ACTIVAR BOTÓN GPTM"
             setOnClickListener { enableFloatingButton() }
         }
         val stopOverlay = Button(this).apply {
-            text = "DESACTIVAR BOTÓN FLOTANTE"
+            text = "DESACTIVAR BOTÓN GPTM"
             setOnClickListener {
                 stopService(Intent(this@LauncherActivity, OverlayService::class.java))
-                Toast.makeText(this@LauncherActivity, "Botón flotante desactivado", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@LauncherActivity, "GPTM desactivado", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -70,7 +70,7 @@ class LauncherActivity : Activity() {
             return
         }
         startService(Intent(this, OverlayService::class.java))
-        Toast.makeText(this, "Botón flotante activado", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "GPTM activado", Toast.LENGTH_SHORT).show()
     }
 
     private fun launchGame() {
@@ -78,7 +78,7 @@ class LauncherActivity : Activity() {
         if (launchIntent == null) {
             Toast.makeText(
                 this,
-                "No encuentro Geometry Dash instalado con el paquete esperado. Comprueba que tienes la versión oficial instalada.",
+                "No encuentro Geometry Dash con el paquete esperado. Puede que esta versión use otro identificador.",
                 Toast.LENGTH_LONG
             ).show()
             return
