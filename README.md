@@ -29,3 +29,8 @@ The newest source commits trigger Android32 and Android64 builds through GitHub 
 ## Build
 
 Open Actions → Build Android Geode mod. Successful jobs upload .geode artifacts for Android32 and Android64. A successful compile alone does not prove in-game behavior.
+
+
+## Experimental C-to-Triggers parser
+
+The repository now also contains an isolated first parser prototype in `src/CCodeTranslator.hpp` and `src/CCodeTranslator.cpp`, with the supported syntax documented in `docs/C_TO_TRIGGERS.md`. It validates a deliberately limited C-like command list and returns a trigger plan; it does not execute arbitrary C code. **This is not yet an in-editor translator UI and does not yet create Geometry Dash trigger objects.** Those are the next implementation steps. The module is compiled into the existing native target, but its runtime integration and in-game behavior have not been verified.
