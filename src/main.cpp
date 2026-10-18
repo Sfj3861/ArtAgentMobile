@@ -333,10 +333,32 @@ class $modify(ArtAgentEditorUI, EditorUI) {
             m_fields->promptHash = (m_fields->promptHash ^ ch) * 16777619u;
         m_fields->previewDescription = prompt;
         m_fields->previewReady = true;
+
+        // Estimate complexity before insertion. This is intentionally an estimate:
+        // each style uses different spacing and the contour pass deduplicates points.
+        float previewW = std::max(90.f, m_fields->layoutMaxX - m_fields->layoutMinX + 60.f);
+        float previewH = std::max(60.f, m_fields->layoutMaxY - m_fields->layoutMinY + 60.f);
+        int previewStride = m_fields->detail == 1 ? 3 : m_fields->detail == 2 ? 2 : 1;
+        if (m_fields->density == 2) previewStride = std::max(1, previewStride - 1);
+        else if (m_fields->density == 0) previewStride = std::min(4, previewStride + 1);
+        int estimatedObjects = static_cast<int>(
+            (previewW / (30.f * previewStride) + previewH / (30.f * previewStride)) * 2.f
+        );
+        if (m_fields->pattern == 0) {
+            estimatedObjects = static_cast<int>(m_fields->layoutPoints.size() *
+                (m_fields->detail >= 2 ? 5.f : 3.f));
+        } else {
+            estimatedObjects = static_cast<int>(estimatedObjects *
+                (m_fields->detail == 1 ? 1.0f : m_fields->detail == 2 ? 1.8f : 2.7f));
+        }
+        if (m_fields->detail >= 2)
+            estimatedObjects += m_fields->density == 2 ? 18 : m_fields->density == 0 ? 5 : 10;
+        estimatedObjects = std::max(1, std::min(1200, estimatedObjects));
         this->setStatus((std::string("Plan: ") + names[m_fields->pattern] +
             (m_fields->density == 2 ? " / dense" : m_fields->density == 0 ? " / sparse" : " / normal") +
             " / seed " + std::to_string(m_fields->seed) +
-            ". Plan preview only; INSERT creates editable blocks.").c_str());
+            " / approx. " + std::to_string(estimatedObjects) +
+            " objects. Estimate only; INSERT creates editable blocks.").c_str());
     }
 
     void onInsert(CCObject*) {
