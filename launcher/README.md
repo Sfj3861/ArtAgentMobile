@@ -11,7 +11,7 @@ This is a separate Android app project in the ArtAgentMobile repository. It is d
 
 ## Important: injection is not implemented
 
-Android apps are sandboxed. A normal launcher cannot grant itself “absolute permission” over Geometry Dash or inject native code into its process just by starting the game. The overlay permission only allows a window to be drawn over other apps; it does not grant process access. This prototype does **not** patch the game, inject a library, execute arbitrary C code, or create Geometry Dash triggers yet. Opening Geometry Dash directly will not activate any injection because there is no injector in this build.
+Android apps are sandboxed. A normal launcher cannot grant itself “absolute permission” over Geometry Dash or inject native code into its process just by starting the game. The overlay permission only allows a window to be drawn over other apps; it does not grant process access. This prototype does **not** patch the game, inject a library, execute arbitrary C code, or create Geometry Dash triggers yet. GPTM's current switches only demonstrate the interface and are not functional game mods. Opening Geometry Dash directly will not activate any injection because there is no injector in this build.
 
 The next stage is to establish a device-compatible, explicitly opt-in integration path and connect the C-like command parser to a safe trigger-plan UI. Any implementation that requires root, a repackaged game, or a specific ABI must be designed and tested separately; this source does not claim compatibility with every Android device.
 
